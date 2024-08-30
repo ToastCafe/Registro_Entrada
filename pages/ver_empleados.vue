@@ -121,7 +121,7 @@ const rows = computed(() => {
   <div class="flex flex-col items-center mt-10 mx-14">
     <div class="w-full max-w-3xl">
       <!-- Aumentar tamaño de letra y establecer altura fija -->
-      <UTable :rows="rows" class="text-lg h-[319px]"
+      <UTable :rows="rows" class="text-lg h-[359px]"
         :loading-state="{ icon: 'i-heroicons-arrow-path-20-solid', label: 'Cargando...' }" :ui="tableConfig"
         :loading="true"
         :empty-state="{ icon: 'i-heroicons-circle-stack-20-solid', label: 'No hay empleados registrados actualmente.' }" />

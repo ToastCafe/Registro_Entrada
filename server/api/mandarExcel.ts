@@ -66,7 +66,11 @@ export default defineEventHandler(async () => {
   const datosExportadosAExcelAZ = [];
 
   try {
-    const asistencia = await prisma.asistencia.findMany();
+    const asistencia = await prisma.asistencia.findMany({
+      orderBy:{
+        id: "asc"
+      }
+    });
     const fechas = Array.from(
       new Set(
         asistencia.map(
@@ -115,7 +119,7 @@ export default defineEventHandler(async () => {
           console.log("Hora de salida: " + horaSalida);
           const diferenciaHoras = calcularDiferenciaHoras(
             horaEntrada,
-            horaSalida || "00:00:00"
+            horaSalida || horaEntrada
           );
           horasTrabajadas.push(diferenciaHoras);
           diasTrabajados.push(dia);
@@ -217,8 +221,8 @@ export default defineEventHandler(async () => {
     const fecha = new Date();
     //: Limpiar la base de datos
     console.log("Fecha de eliminacion:", fecha);
-    await prisma.$executeRawUnsafe("TRUNCATE TABLE asistencia;");
-    await prisma.$executeRawUnsafe("SELECT setval('asistencia_id_seq', 1, false);");
+    //await prisma.$executeRawUnsafe("TRUNCATE TABLE asistencia;");
+    //await prisma.$executeRawUnsafe("SELECT setval('asistencia_id_seq', 1, false);");
 
   } catch (error) {
     console.error("Error al enviar el correo: " + error);

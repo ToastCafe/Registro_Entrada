@@ -22,7 +22,7 @@ export default defineEventHandler(async (event) => {
     if (empleado.sede === "Aguas Zarcas") {
       empleado.sede = "AZ"
     }else if(empleado.sede === "Ciudad Quesada"){
-      empleado.sede = "SC"
+      empleado.sede = "CQ"
     }else{
       empleado.sede = "ADMIN"
     }
