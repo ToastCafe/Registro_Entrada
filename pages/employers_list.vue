@@ -104,6 +104,8 @@ interface empleado {
   apellido1: string
   hora_entrada: string
   hora_salida: string
+  hora_entrada_almuerzo: string
+  hora_salida_almuerzo: string
   class: string
 }
 
@@ -178,8 +180,17 @@ const obtener_empleados = async () => {
         empleado.hora_salida = convertirFormatoHora24a12(empleado.hora_salida)
       }
       else {
-        empleado.class = 'bg-red-200'
+        empleado.class = 'bg-orange-200'
         empleado.hora_salida = 'En trabajo'
+        return
+      }
+      if (empleado.hora_entrada_almuerzo === null ){
+        empleado.hora_entrada_almuerzo = 'En trabajo'
+        empleado.class = 'bg-orange-200'
+      }
+      if (empleado.hora_salida_almuerzo === null || empleado.hora_entrada_almuerzo !== null){
+        empleado.hora_salida = 'En almuerzo'
+        empleado.class = 'bg-blue-600'
       }
     })
     empleados.value = data
