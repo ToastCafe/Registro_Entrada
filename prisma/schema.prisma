@@ -3,17 +3,20 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
-  url      = env("DATABASE_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  //directUrl = env("DIRECT_URL")
 }
 
 model asistencia {
-  id           Int       @id @default(autoincrement())
-  cedula       String    @db.VarChar(20)
-  fecha        DateTime  @db.Date
-  hora_entrada DateTime  @db.Time(6)
-  hora_salida  DateTime? @db.Time(6)
-  empleados    empleados @relation(fields: [cedula], references: [cedula], onDelete: NoAction, onUpdate: NoAction)
+  id                    Int       @id @default(autoincrement())
+  cedula                String    @db.VarChar(20)
+  fecha                 DateTime  @db.Date
+  hora_entrada          DateTime  @db.Time(6)
+  hora_salida           DateTime? @db.Time(6)
+  hora_entrada_almuerzo DateTime? @db.Time(6)
+  hora_salida_almuerzo  DateTime? @db.Time(6)
+  empleados             empleados @relation(fields: [cedula], references: [cedula], onDelete: NoAction, onUpdate: NoAction)
 
   @@unique([cedula, fecha])
 }
@@ -25,6 +28,6 @@ model empleados {
   apellido2  String       @db.VarChar(50)
   correo     String       @db.VarChar(100)
   telefono   String       @db.VarChar(20)
-  sede       String       @db.VarChar(50)
+  sede       String?
   asistencia asistencia[]
 }
