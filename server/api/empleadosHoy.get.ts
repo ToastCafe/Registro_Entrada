@@ -38,6 +38,8 @@ export default defineEventHandler(async () => {
       }
     });
 
+    //HACER LA LOGICA AQUI 
+
     return empleadoshoy;
   } catch (error) {
     console.error("Error executing query:", error);

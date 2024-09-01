@@ -87,7 +87,15 @@ const columns = [{
 }, {
   key: 'hora_entrada',
   label: 'Hora de entrada'
-}, {
+  }, {
+    key: 'hora_entrada_almuerzo',
+    label: 'Entrada almuerzo'
+  },
+  {
+    key: 'hora_salida_almuerzo',
+    label: 'Regreso almuerzo'
+  },
+  {
   key: 'hora_salida',
   label: 'Hora de salida'
 }, {
@@ -180,17 +188,11 @@ const obtener_empleados = async () => {
         empleado.hora_salida = convertirFormatoHora24a12(empleado.hora_salida)
       }
       else {
-        empleado.class = 'bg-orange-200'
+        empleado.class = 'bg-red-200'
         empleado.hora_salida = 'En trabajo'
-        return
       }
-      if (empleado.hora_entrada_almuerzo === null ){
-        empleado.hora_entrada_almuerzo = 'En trabajo'
-        empleado.class = 'bg-orange-200'
-      }
-      if (empleado.hora_salida_almuerzo === null || empleado.hora_entrada_almuerzo !== null){
-        empleado.hora_salida = 'En almuerzo'
-        empleado.class = 'bg-blue-600'
+      if(empleado.hora_entrada_almuerzo === null){
+        empleado.class
       }
     })
     empleados.value = data
@@ -201,7 +203,6 @@ const obtener_empleados = async () => {
     console.log("error")
   }
 }
-
 
 
 const marcar_salida = async (row: empleado) => {
