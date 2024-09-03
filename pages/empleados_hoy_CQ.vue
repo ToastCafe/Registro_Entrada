@@ -8,7 +8,7 @@ const tableConfig = {
   wrapper: 'relative overflow-x-auto bg-white border border-gray-300', // Fondo blanco y borde gris claro para el contenedor
   base: 'min-w-full table-fixed border-collapse', // Border-collapse para compartir bordes
   divide: 'divide-y divide-gray-200 dark:divide-gray-700', // Líneas divisorias grises
-  thead: 'relative bg-gray-800 border-b border-gray-300', // Fondo oscuro para el encabezado con borde inferior gris claro
+  thead: 'relative bg-orange-950 border-b border-gray-300', // Fondo oscuro para el encabezado con borde inferior gris claro
   tbody: 'divide-y divide-gray-200 dark:divide-gray-800', // Líneas divisorias grises en el cuerpo
   caption: 'sr-only',
   tr: {
@@ -104,6 +104,7 @@ interface empleado {
   apellido1: string
   hora_entrada: string
   hora_salida: string
+  sede: string
   class: string
 }
 
@@ -163,27 +164,27 @@ function convertirFormatoHora24a12(hora24: string) {
 
 
 const obtener_empleados = async () => {
-
   try {
     const res = await fetch('/api/empleadosHoy')
     const data = await res.json()
 
-    data.forEach((empleado: empleado) => {
+    const empleadosFiltrados = data.filter((empleado: empleado) => empleado.sede === "CQ")
 
+    empleadosFiltrados.forEach((empleado: empleado) => {
       empleado.nombre = empleado.nombre + ' ' + empleado.apellido1
 
       empleado.hora_entrada = convertirFormatoHora24a12(empleado.hora_entrada)
       if (empleado.hora_salida !== null) {
-        empleado.class = 'bg-green-200 '
+        empleado.class = 'bg-green-200'
         empleado.hora_salida = convertirFormatoHora24a12(empleado.hora_salida)
-      }
-      else {
+      } else {
         empleado.class = 'bg-red-200'
         empleado.hora_salida = 'En trabajo'
       }
     })
-    empleados.value = data
-    console.log(data)
+
+    empleados.value = empleadosFiltrados
+    console.log(empleados.value)
     cargando.value = false
 
   } catch (error) {
