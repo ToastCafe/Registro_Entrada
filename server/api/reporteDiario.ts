@@ -44,12 +44,14 @@ export default defineEventHandler(async () => {
       "SELECT * FROM consultarempleadosHoySede()"
     )) as Empleado[];
     */
-
+    /*
    const empleadoshoy = (await prisma.$queryRawUnsafe<Empleado[]>(
      "SELECT * FROM ConsultarEmpleadosPorFecha('2024-09-04');"
    )) as Empleado[];
-
-
+    */
+    const empleadoshoy = (await prisma.$queryRawUnsafe<Empleado[]>(
+      "SELECT * FROM ConsultarEmpleadosDiaAnterior();"
+    )) as Empleado[];
 
 
     const encabezado = ["nombre","hora_entrada","hora_salida","sede"];
