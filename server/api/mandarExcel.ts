@@ -67,9 +67,9 @@ export default defineEventHandler(async () => {
 
   try {
     const asistencia = await prisma.asistencia.findMany({
-      orderBy:{
-        id: "asc"
-      }
+      orderBy: {
+        id: "asc",
+      },
     });
     const fechas = Array.from(
       new Set(
@@ -90,9 +90,18 @@ export default defineEventHandler(async () => {
       },
     });
 
-    console.log("TODOS TODOS TODOS Los empleados son: " + empleadosInfo.map((empleado) => empleado.nombre + " " + empleado.apellido1 + " " + empleado.apellido2));
+    console.log(
+      "TODOS TODOS TODOS Los empleados son: " +
+        empleadosInfo.map(
+          (empleado) =>
+            empleado.nombre +
+            " " +
+            empleado.apellido1 +
+            " " +
+            empleado.apellido2
+        )
+    );
 
-   
     const encabezado = ["Nombre", ...fechas, "Total de horas"];
     datosExportadosAExcelCQ.push(encabezado);
     datosExportadosAExcelAZ.push(encabezado);
@@ -141,7 +150,15 @@ export default defineEventHandler(async () => {
       for (const empleadoInfo of empleadosInfo) {
         if (empleadoInfo.cedula === empleadoActual) {
           horasTrabajadas.push(calcularTotalHorasTrabajadas(horasTrabajadas));
-          horasTrabajadas.splice(0, 0, empleadoInfo.nombre + " " + empleadoInfo.apellido1 + " " + empleadoInfo.apellido2);
+          horasTrabajadas.splice(
+            0,
+            0,
+            empleadoInfo.nombre +
+              " " +
+              empleadoInfo.apellido1 +
+              " " +
+              empleadoInfo.apellido2
+          );
           if (empleadoInfo.sede === "CQ") {
             datosExportadosAExcelCQ.push(horasTrabajadas);
           } else {
@@ -159,12 +176,26 @@ export default defineEventHandler(async () => {
   } finally {
     await prisma.$disconnect();
   }
-    
+
   //: Crear el archivo Excel
 
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Informe CQ");
+
+  // Agregar las filas
   worksheet.addRows(datosExportadosAExcelCQ);
+
+  // Ajustar el tamaño de las columnas con respecto al contenido
+  worksheet.columns.forEach((column) => {
+    let maxLength = 0;
+    //@ts-ignore
+    column.eachCell({ includeEmpty: true }, (cell) => {
+      const cellValue = cell.value ? cell.value.toString() : "";
+      maxLength = Math.max(maxLength, cellValue.length);
+    });
+    column.width = maxLength + 2; // Añadir un margen para que no quede muy ajustado
+  });
+
   const excelBuffer = await workbook.xlsx.writeBuffer();
   const readableStream = new Readable();
   readableStream._read = () => {}; // No-op
@@ -172,8 +203,22 @@ export default defineEventHandler(async () => {
   readableStream.push(null); // Indicar el final del stream
 
   const workbook2 = new ExcelJS.Workbook();
-  const worksheet2 = workbook2.addWorksheet("Informe AZ ");
-  worksheet2.addRows(datosExportadosAExcelAZ); 
+  const worksheet2 = workbook2.addWorksheet("Informe AZ");
+
+  // Agregar las filas
+  worksheet2.addRows(datosExportadosAExcelAZ);
+
+  // Ajustar el tamaño de las columnas con respecto al contenido
+  worksheet2.columns.forEach((column) => {
+    let maxLength = 0;
+    //@ts-ignore
+    column.eachCell({ includeEmpty: true }, (cell) => {
+      const cellValue = cell.value ? cell.value.toString() : "";
+      maxLength = Math.max(maxLength, cellValue.length);
+    });
+    column.width = maxLength + 2; // Añadir un margen para que no quede muy ajustado
+  });
+
   const excelBuffer2 = await workbook2.xlsx.writeBuffer();
   const readableStream2 = new Readable();
   readableStream2._read = () => {}; // No-op
@@ -183,19 +228,19 @@ export default defineEventHandler(async () => {
   //: Configurar el transporte del correo
 
   const transporter = nodemailer.createTransport({
-    service: "gmail", 
+    service: "gmail",
     auth: {
-      user: process.env.CORREO_ENVIANTE, 
-      pass: process.env.CONTRASENA, 
+      user: process.env.CORREO_ENVIANTE,
+      pass: process.env.CONTRASENA,
     },
   });
 
   //: Configurar el correo
   const mailOptions = {
-    from: process.env.CORREO_ENVIANTE, 
-    to: process.env.CORREO_DESTINO, 
+    from: process.env.CORREO_ENVIANTE,
+    to: process.env.CORREO_DESTINO,
     subject: "Informe Mensual de las horas trabajadas en locales Toast",
-    text: "Informe Mensual de las horas trabajadas ", 
+    text: "Informe Mensual de las horas trabajadas ",
     attachments: [
       {
         filename: "Informe Ciudad Quesada Toast.xlsx",
@@ -217,17 +262,14 @@ export default defineEventHandler(async () => {
     const info = await transporter.sendMail(mailOptions);
     console.log("Correo enviado: " + info.response);
 
-
     const fecha = new Date();
     //: Limpiar la base de datos
     console.log("Fecha de eliminacion:", fecha);
     //await prisma.$executeRawUnsafe("TRUNCATE TABLE asistencia;");
     //await prisma.$executeRawUnsafe("SELECT setval('asistencia_id_seq', 1, false);");
-
   } catch (error) {
     console.error("Error al enviar el correo: " + error);
-  }
-  finally {
+  } finally {
     await prisma.$disconnect();
   }
 
