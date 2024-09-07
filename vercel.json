@@ -1,11 +1,11 @@
 {
   "crons": [
     {
-      "path": "/server/api/reporteDiario",
+      "path": "/api/reporteDiario",
       "schedule": "30 5 * * *"
     },
     {
-        "path": "/server/api/reporteQuincena",
+        "path": "/api/reporteQuincena",
         "schedule": "30 5 1,15 * *"
     }
   ]
