@@ -239,8 +239,8 @@ export default defineEventHandler(async () => {
   const mailOptions = {
     from: process.env.CORREO_ENVIANTE,
     to: process.env.CORREO_DESTINO,
-    subject: "Informe Mensual de las horas trabajadas en locales Toast",
-    text: "Informe Mensual de las horas trabajadas ",
+    subject: "Informe Semanal de las horas trabajadas en locales Toast",
+    text: "Informe Semanal de las horas trabajadas ",
     attachments: [
       {
         filename: "Informe Ciudad Quesada Toast.xlsx",
