@@ -6,7 +6,7 @@
     },
     {
         "path": "/api/reporteQuincena",
-        "schedule": "5 6 1,15 * *"
+        "schedule": "30 7 * * 4"
     }
   ]
 }
