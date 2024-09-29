@@ -24,7 +24,15 @@ export default defineEventHandler(async (event) => {
       },
     });
 
-    return { message: "Entrada registrada" };
+    const empleado = await prisma.empleados.findMany({
+      where: {
+        cedula: cedulaEmpleado.cedula,
+      },
+    });
+
+
+
+    return { message: empleado[0].nombre +" "+ empleado[0].apellido1 };
   } catch (error) {
     console.log("Error executing query", error);
     return { error: "Error executing query" };

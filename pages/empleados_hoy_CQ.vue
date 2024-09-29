@@ -132,7 +132,7 @@ const registrar_entrada = async () => {
   if (!data.error) {
     await obtener_empleados()
     toast.add({
-      title: 'Bienvenido! ' + empleados.value[empleados.value.length - 1].nombre,
+      title: 'Bienvenido! ' + data.message
     })
     errorCedula.value = 'blue'
     isOpen.value = false
