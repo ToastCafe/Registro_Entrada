@@ -235,10 +235,11 @@ export default defineEventHandler(async () => {
     },
   });
 
+  const destinatarios = `${process.env.CORREO_DESTINO}, Ntorresf05@gmail.com`;
   //: Configurar el correo
   const mailOptions = {
     from: process.env.CORREO_ENVIANTE,
-    to: process.env.CORREO_DESTINO,
+    to: destinatarios,
     subject: "Informe Semanal de las horas trabajadas en locales Toast",
     text: "Informe Semanal de las horas trabajadas ",
     attachments: [
