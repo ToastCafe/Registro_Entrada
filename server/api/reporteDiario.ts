@@ -244,6 +244,7 @@ export default defineEventHandler(async () => {
     console.log("Correo enviado: " + info.response);
 
     console.log("datosExportadosAExcel", datosExportadosAExcelCQ);
+    console.log("actualizacion de vercel");
     return empleadoshoy;
   } catch (error) {
     console.error("Error executing query:", error);
