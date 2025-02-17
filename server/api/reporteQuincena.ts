@@ -235,7 +235,7 @@ export default defineEventHandler(async () => {
     },
   });
 
-  const destinatarios = `${process.env.CORREO_DESTINO}, Ntorresf05@gmail.com`;
+  const destinatarios = `${process.env.CORREO_DESTINO}`;
   //: Configurar el correo
   const mailOptions = {
     from: process.env.CORREO_ENVIANTE,
@@ -266,8 +266,8 @@ export default defineEventHandler(async () => {
     const fecha = new Date();
     //: Limpiar la base de datos
     console.log("Fecha de eliminacion:", fecha);
-    await prisma.$executeRawUnsafe("TRUNCATE TABLE asistencia;");
-    await prisma.$executeRawUnsafe("SELECT setval('asistencia_id_seq', 1, false);");
+    //await prisma.$executeRawUnsafe("TRUNCATE TABLE asistencia;");
+    //await prisma.$executeRawUnsafe("SELECT setval('asistencia_id_seq', 1, false);");
   } catch (error) {
     console.error("Error al enviar el correo: " + error);
   } finally {

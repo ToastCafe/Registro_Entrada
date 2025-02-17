@@ -92,16 +92,16 @@ export default defineEventHandler(async () => {
       "SELECT * FROM consultarempleadosHoySede()"
     )) as Empleado[];
     */
-    /*
-    const empleadoshoy = (await prisma.$queryRawUnsafe<Empleado[]>(
-      "SELECT * FROM ConsultarEmpleadosPorFecha('2024-09-06');"
-    )) as Empleado[];
-    */
     
+    const empleadoshoy = (await prisma.$queryRawUnsafe<Empleado[]>(
+      "SELECT * FROM ConsultarEmpleadosPorFecha('2025-02-16');"
+    )) as Empleado[];
+    
+    /*
     const empleadoshoy = (await prisma.$queryRawUnsafe<Empleado[]>(
       "SELECT * FROM ConsultarEmpleadosDiaAnterior();"
     )) as Empleado[];
-    
+    */
 
     const encabezado = [
       "nombre",
@@ -222,7 +222,7 @@ export default defineEventHandler(async () => {
       },
     });
 
-    const destinatarios = `${process.env.CORREO_DESTINO}, Ntorresf05@gmail.com`;
+    const destinatarios = `${process.env.CORREO_DESTINO}`;
     //: Configurar el correo
     const mailOptions = {
       from: process.env.CORREO_ENVIANTE,
