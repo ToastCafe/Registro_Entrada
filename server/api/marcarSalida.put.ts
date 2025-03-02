@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
     const formattedDate = format(zonedDate, "yyyy-MM-dd HH:mm:ss" + "-00:00");
 
     console.log("Hora local en la zona horaria especificada:", formattedDate);
-
+    console.log("Cédula del empleado:", cedulaEmpleado.cedula);
     await prisma.asistencia.updateMany({
       where: {
         cedula: cedulaEmpleado.cedula,
