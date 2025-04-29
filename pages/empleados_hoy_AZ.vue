@@ -123,7 +123,8 @@ const registrar_entrada = async () => {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify({
-      cedula: cedulaInput.value
+      cedula: cedulaInput.value,
+      sede: "AZ"
     })
   })
   cargando.value = true
@@ -205,6 +206,7 @@ const marcar_salida = async (row: empleado) => {
     },
     body: JSON.stringify({
       cedula: row.cedula,
+      sede: "AZ"
     })
   })
   const data = await res.json()

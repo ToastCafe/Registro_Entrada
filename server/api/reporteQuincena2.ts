@@ -7,8 +7,6 @@ import { PrismaClient } from "@prisma/client";
 dotenv.config();
 const prisma = new PrismaClient();
 
-
-
 function calcularDiferenciaHoras(
   horaEntrada: string,
   horaSalida: string
@@ -33,7 +31,7 @@ function calcularDiferenciaHoras(
 
 // Función para convertir una cadena de tiempo "hh:mm:ss" a segundos
 function tiempoASegundos(tiempo: string): number {
-  const [horas, minutos, segundos] = tiempo.split(':').map(Number);
+  const [horas, minutos, segundos] = tiempo.split(":").map(Number);
   return horas * 3600 + minutos * 60 + segundos;
 }
 
@@ -44,7 +42,9 @@ function segundosATiempo(segundos: number): string {
   const minutos = Math.floor(segundos / 60);
   const segundosRestantes = segundos % 60;
 
-  return `${horas.toString().padStart(2, '0')}:${minutos.toString().padStart(2, '0')}:${segundosRestantes.toString().padStart(2, '0')}`;
+  return `${horas.toString().padStart(2, "0")}:${minutos
+    .toString()
+    .padStart(2, "0")}:${segundosRestantes.toString().padStart(2, "0")}`;
 }
 
 // Función para calcular el total de horas trabajadas a partir de una lista de diferencias horarias
@@ -58,26 +58,27 @@ function calcularTotalHorasTrabajadas(diferencias: string[]): string {
   return segundosATiempo(totalSegundos);
 }
 
-
 export default defineEventHandler(async () => {
   const datosExportadosAExcelCQ = [];
   const datosExportadosAExcelAZ = [];
 
   try {
-    const asistencia = await prisma.asistencia.findMany({
+    const asistencia2 = await prisma.asistencia2.findMany({
       orderBy: {
         id: "asc",
       },
     });
+
     const fechas = Array.from(
       new Set(
-        asistencia.map(
+        asistencia2.map(
           (asistencia) => asistencia.fecha.toISOString().split("T")[0]
         )
       )
     );
+
     const empleados = Array.from(
-      new Set(asistencia.map((asistencia) => asistencia.cedula))
+      new Set(asistencia2.map((asistencia) => asistencia.cedula))
     );
 
     const empleadosInfo = await prisma.empleados.findMany({
@@ -88,85 +89,78 @@ export default defineEventHandler(async () => {
       },
     });
 
-    console.log(
-      "TODOS TODOS TODOS Los empleados son: " +
-        empleadosInfo.map(
-          (empleado) =>
-            empleado.nombre +
-            " " +
-            empleado.apellido1 +
-            " " +
-            empleado.apellido2
-        )
-    );
-
     const encabezado = ["Nombre", ...fechas, "Total de horas"];
     datosExportadosAExcelCQ.push(encabezado);
     datosExportadosAExcelAZ.push(encabezado);
 
     for (const empleadoActual of empleados) {
-      const diasTrabajados = [];
-      const horasTrabajadas = [];
+      // Filtrar y agrupar asistencias por sede
+      const asistenciasEmpleado = asistencia2.filter(
+        (a) => a.cedula === empleadoActual
+      );
+      const sedesMap = new Map<string, typeof asistenciasEmpleado>();
 
-      console.log("El empleado actual es: " + empleadoActual + " y trabajó: ");
+      for (const registro of asistenciasEmpleado) {
+        const sede = registro.sede;
+        if (!sedesMap.has(sede)) {
+          sedesMap.set(sede, []);
+        }
+        sedesMap.get(sede)?.push(registro);
+      }
 
-      for (const registro of asistencia) {
-        if (empleadoActual === registro.cedula) {
-          const dia = registro.fecha.toISOString().split("T")[0];
+      // Procesar cada sede del empleado
+      for (const [sede, registrosSede] of sedesMap) {
+        const horasTrabajadas: string[] = new Array(fechas.length).fill(
+          "00:00:00"
+        );
+
+        // Calcular horas por fecha
+        for (const registro of registrosSede) {
+          const fechaStr = registro.fecha.toISOString().split("T")[0];
+          const fechaIndex = fechas.indexOf(fechaStr);
+
+          if (fechaIndex === -1) continue;
+
           const horaEntrada = registro.hora_entrada
             .toISOString()
             .split("T")[1]
             .split(".")[0];
-          const horaSalida = registro.hora_salida
-            ?.toISOString()
-            .split("T")[1]
-            .split(".")[0];
-          console.log("Día: ", dia, " trabajado");
-          console.log("Hora de entrada: " + horaEntrada);
-          console.log("Hora de salida: " + horaSalida);
+
+          const horaSalida =
+            registro.hora_salida?.toISOString().split("T")[1].split(".")[0] ||
+            horaEntrada;
+
           const diferenciaHoras = calcularDiferenciaHoras(
             horaEntrada,
-            horaSalida || horaEntrada
+            horaSalida
           );
-          horasTrabajadas.push(diferenciaHoras);
-          diasTrabajados.push(dia);
-        }
-      }
 
-      let cont = 0;
-      while (cont < fechas.length) {
-        if (diasTrabajados[cont] !== fechas[cont]) {
-          console.log("El empleado no trabajó el día: " + fechas[cont]);
-          horasTrabajadas.splice(cont, 0, "00:00:00");
-          diasTrabajados.splice(cont, 0, fechas[cont]);
-          cont = 0;
+          horasTrabajadas[fechaIndex] = diferenciaHoras;
+        }
+
+        // Calcular total de horas y crear fila
+        const totalHoras = calcularTotalHorasTrabajadas(horasTrabajadas);
+        const empleadoInfo = empleadosInfo.find(
+          (e) => e.cedula === empleadoActual
+        );
+
+        if (!empleadoInfo) continue;
+
+        const nombreCompleto = [
+          empleadoInfo.nombre,
+          empleadoInfo.apellido1,
+          empleadoInfo.apellido2,
+        ].join(" ");
+
+        const fila = [nombreCompleto, ...horasTrabajadas, totalHoras];
+
+        // Agregar a la sede correspondiente
+        if (sede === "CQ") {
+          datosExportadosAExcelCQ.push(fila);
         } else {
-          cont++;
+          datosExportadosAExcelAZ.push(fila);
         }
       }
-
-      for (const empleadoInfo of empleadosInfo) {
-        if (empleadoInfo.cedula === empleadoActual) {
-          horasTrabajadas.push(calcularTotalHorasTrabajadas(horasTrabajadas));
-          horasTrabajadas.splice(
-            0,
-            0,
-            empleadoInfo.nombre +
-              " " +
-              empleadoInfo.apellido1 +
-              " " +
-              empleadoInfo.apellido2
-          );
-          if (empleadoInfo.sede === "CQ") {
-            datosExportadosAExcelCQ.push(horasTrabajadas);
-          } else {
-            datosExportadosAExcelAZ.push(horasTrabajadas);
-          }
-          break;
-        }
-      }
-      console.log(horasTrabajadas);
-      console.log(fechas);
     }
   } catch (error) {
     console.error("Error executing query:", error);
@@ -175,8 +169,11 @@ export default defineEventHandler(async () => {
     await prisma.$disconnect();
   }
 
-  //: Crear el archivo Excel
 
+  console.log("Datos exportados a Excel CQ: ", datosExportadosAExcelCQ);
+  console.log("Datos exportados a Excel AZ: ", datosExportadosAExcelAZ);
+  //: Crear el archivo Excel
+  
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Informe CQ");
 
@@ -264,13 +261,13 @@ export default defineEventHandler(async () => {
     const fecha = new Date();
     //: Limpiar la base de datos
     console.log("Fecha de eliminacion:", fecha);
-//    await prisma.$executeRawUnsafe("TRUNCATE TABLE asistencia;");
-//    await prisma.$executeRawUnsafe("SELECT setval('asistencia_id_seq', 1, false);");
+    //    await prisma.$executeRawUnsafe("TRUNCATE TABLE asistencia2;");
+    //    await prisma.$executeRawUnsafe("SELECT setval('asistencia2_id_seq', 1, false);");
   } catch (error) {
     console.error("Error al enviar el correo: " + error);
   } finally {
     await prisma.$disconnect();
   }
-
+  
   return { message: "Correo enviado" };
 });

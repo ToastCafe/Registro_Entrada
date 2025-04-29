@@ -15,10 +15,11 @@ export default defineEventHandler(async (event) => {
 
     console.log("Hora local en la zona horaria especificada:", formattedDate);
 
-    await prisma.asistencia.updateMany({
+    await prisma.asistencia2.updateMany({
       where: {
         cedula: cedulaEmpleado.cedula,
-        fecha: formattedDate
+        fecha: formattedDate,
+        sede: cedulaEmpleado.sede,
       },
       data: {
         hora_salida: formattedDate,

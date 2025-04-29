@@ -6,7 +6,7 @@ const prisma = new PrismaClient();
 
 export default defineEventHandler(async (event) => {
   try {
-    const cedulaEmpleado = await readBody(event);
+    const empleadoEvent = await readBody(event);
 
     const nowUtc = new Date();
 
@@ -16,17 +16,41 @@ export default defineEventHandler(async (event) => {
 
     console.log("Hora local en la zona horaria especificada:", formattedDate);
 
-    await prisma.asistencia.create({
+
+    const asistencia = await prisma.asistencia2.findFirst({
+      where: {
+        cedula: empleadoEvent.cedula,
+        fecha: formattedDate,
+      },
+    });
+
+    if (asistencia) {
+      await prisma.asistencia2.updateMany({
+        where: {
+          cedula: empleadoEvent.cedula,
+          fecha: formattedDate,
+        },
+        data: {
+          sede: empleadoEvent.sede,
+        },
+      });
+      return { message: "Cambio de sede realizado" };
+    }
+
+
+
+    await prisma.asistencia2.create({
       data: {
-        cedula: cedulaEmpleado.cedula,
+        cedula: empleadoEvent.cedula,
         fecha: formattedDate,
         hora_entrada: formattedDate,
+        sede: empleadoEvent.sede,
       },
     });
 
     const empleado = await prisma.empleados.findMany({
       where: {
-        cedula: cedulaEmpleado.cedula,
+        cedula: empleadoEvent.cedula,
       },
     });
 

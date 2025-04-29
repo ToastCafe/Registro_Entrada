@@ -94,7 +94,7 @@ export default defineEventHandler(async () => {
     */
     
     const empleadoshoy = (await prisma.$queryRawUnsafe<Empleado[]>(
-      "SELECT * FROM ConsultarEmpleadosPorFecha('2025-02-16');"
+      "SELECT * FROM consultarempleadosdiaanterior2();"
     )) as Empleado[];
     
     /*
