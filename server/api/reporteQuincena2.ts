@@ -258,11 +258,20 @@ export default defineEventHandler(async () => {
     const info = await transporter.sendMail(mailOptions);
     console.log("Correo enviado: " + info.response);
 
-    const fecha = new Date();
+
+
+
     //: Limpiar la base de datos
-    console.log("Fecha de eliminacion:", fecha);
-    //    await prisma.$executeRawUnsafe("TRUNCATE TABLE asistencia2;");
-    //    await prisma.$executeRawUnsafe("SELECT setval('asistencia2_id_seq', 1, false);");
+    const today = new Date();
+    const day = today.getUTCDate();
+    console.log("Fecha de eliminacion:", today);
+    
+    if (day === 1 || day === 15 || day === 16 ) {
+      await prisma.$executeRawUnsafe("TRUNCATE TABLE asistencia2;");
+      await prisma.$executeRawUnsafe("SELECT setval('asistencia2_id_seq', 1, false);");
+    }
+
+
   } catch (error) {
     console.error("Error al enviar el correo: " + error);
   } finally {

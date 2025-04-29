@@ -115,19 +115,8 @@ export default defineEventHandler(async (event) => {
     });
 
 
-    const empleadosCQ: any[] = [];
-    const empleadosAZ: any[] = [];
-
-    empleadoshoy.forEach((empleado) => {
-      //@ts-ignore
-      if (empleado.sede === 'CQ') {
-      empleadosCQ.push(empleado);
-      } else {
-      empleadosAZ.push(empleado);
-      }
-    });
     
-    return {empleadosCQ, empleadosAZ};
+    return {empleados: empleadoshoy};
   } catch (error) {
     console.error("Error executing query:", error);
     return { error: "Error executing query" };
