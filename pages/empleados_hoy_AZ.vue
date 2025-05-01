@@ -290,6 +290,14 @@ const rows = computed(() => {
         <div class="flex justify-center">
           <UButton label="Confirmar" color="blue" @click="registrar_entrada" :disabled="cargando" />
         </div>
+        <div class="text-center mt-4 text-sm text-gray-500 dark:text-gray-400">
+          IMPORTANTE: A partir del 1 de mayo, utilice solo 1 usuario para marcar su entrada, es decir,
+          ya no es debe tener 2 usuarios para marcar la entrada según en la sede que iba a trabajar.
+        </div>
+        <div class="text-center mt-4 text-sm text-gray-500 dark:text-gray-400">
+          Si se equivoca y marca la sede en la que no se encuentra trabajando, no se preocupe, simplemente
+          vaya a la sede correcta y marque su entrada, el sistema lo registrará automáticamente.
+        </div>
 
       </UCard>
     </UModal>
