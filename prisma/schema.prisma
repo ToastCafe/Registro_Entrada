@@ -20,12 +20,35 @@ model asistencia {
 }
 
 model empleados {
-  cedula     String       @id @db.VarChar(20)
-  nombre     String       @db.VarChar(50)
-  apellido1  String       @db.VarChar(50)
-  apellido2  String       @db.VarChar(50)
-  correo     String       @db.VarChar(100)
-  telefono   String       @db.VarChar(20)
-  sede       String
-  asistencia asistencia[]
+  cedula      String        @id @db.VarChar(20)
+  nombre      String        @db.VarChar(50)
+  apellido1   String        @db.VarChar(50)
+  apellido2   String        @db.VarChar(50)
+  correo      String        @db.VarChar(100)
+  telefono    String        @db.VarChar(20)
+  sede        String
+  asistencia  asistencia[]
+  asistencia2 asistencia2[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model asistencia2 {
+  id           Int       @id @default(autoincrement())
+  hora_entrada DateTime  @db.Time(6)
+  hora_salida  DateTime? @db.Time(6)
+  fecha        DateTime  @db.Date
+  cedula       String    @db.VarChar
+  sede         String
+  empleados    empleados @relation(fields: [cedula], references: [cedula], onDelete: NoAction, onUpdate: NoAction)
+
+  @@unique([cedula, fecha, sede], map: "unique_cedula_fecha_sede")
+}
+
+model empleados2 {
+  cedula    String @id @db.VarChar(20)
+  nombre    String @db.VarChar(50)
+  apellido1 String @db.VarChar(50)
+  apellido2 String @db.VarChar(50)
+  correo    String @db.VarChar(100)
+  telefono  String @db.VarChar(20)
 }

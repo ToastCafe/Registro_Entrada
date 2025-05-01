@@ -7,7 +7,7 @@ const prisma = new PrismaClient();
 export default defineEventHandler(async () => {
   try {
     const empleadoshoy = (await prisma.$queryRawUnsafe<[]>(
-      "SELECT * FROM consultarempleadosHoySede()"
+      "SELECT * FROM consultarempleadosHoy2()"
     )) as [];
 
     empleadoshoy.forEach((empleado) => {
